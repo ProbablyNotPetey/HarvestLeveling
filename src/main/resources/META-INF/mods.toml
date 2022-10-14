@@ -1,0 +1,35 @@
+# This is an example mods.toml file. It contains the data relating to the loading mods.
+# There are several mandatory fields (#mandatory), and many more that are optional (#optional).
+# The overall format is standard TOML format, v0.5.0.
+# Note that there are a couple of TOML lists in this file.
+# Find more information on toml format here:  https://github.com/toml-lang/toml
+
+# The name of the mod loader type to load - for regular FML @Mod mods it should be javafml
+modLoader="javafml"
+# Forge loader version.
+loaderVersion="[40,)"
+license="MIT"
+#issueTrackerURL="https://change.me.to.your.issue.tracker.example.invalid/"
+
+[[mods]]
+modId="harvest_leveling"
+version="${file.jarVersion}"
+displayName="Harvest Leveling"
+#logoFile="examplemod.png"
+#credits="Thanks for this example mod goes to Java"
+authors="Petey"
+description='''
+Simple mod that lets pack developers override a tool's harvest level.
+'''
+[[dependencies.harvest_leveling]]
+    modId="forge"
+    mandatory=true
+    versionRange="[40,)"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.harvest_leveling]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.18.2,1.19)"
+    ordering="NONE"
+    side="BOTH"

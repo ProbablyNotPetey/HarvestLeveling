@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "com.petey.harvest_leveling.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "DiggerItemMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "refmap": "harvest_leveling.mixin.refmap.json"
+}
