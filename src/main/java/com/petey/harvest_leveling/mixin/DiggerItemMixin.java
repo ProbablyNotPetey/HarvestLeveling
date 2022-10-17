@@ -26,7 +26,7 @@ public abstract class DiggerItemMixin extends TieredItem {
     }
 
     @Inject(method = "isCorrectToolForDrops(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/block/state/BlockState;)Z", at = @At("HEAD"), cancellable = true, remap = false)
-    public void mixinIsCorrectToolForDrops(ItemStack stack, BlockState state, CallbackInfoReturnable<Boolean> cir) {
+    public void harvestleveling_isCorrectToolForDrops(ItemStack stack, BlockState state, CallbackInfoReturnable<Boolean> cir) {
         if(state.is(blocks)) {
             ResourceLocation loc = stack.getItem().getRegistryName();
             ModConfig.ITEM_LEVEL_SET.forEach(element -> {
