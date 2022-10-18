@@ -21,27 +21,24 @@ public class ModConfig {
     public static Set<Element> ITEM_LEVEL_SET;
 
     /**
-     * A config element that has a resource location and a value. The two should be split by a ;
+     * A config element that has a string name and a value. The two should be split by a ;
      * Example: "minecraft:iron_pickaxe;value"
      */
     public static class Element {
 
-        private String value;
-        private ResourceLocation loc;
+        private final String value;
+        private final String name;
 
         public Element(String input) {
             this(input, ';');
         }
+
         private Element(String input, char separator) {
             int separatorIndex = input.indexOf(separator);
             if(separatorIndex == -1) {
                 throw new IllegalArgumentException("String " + input + " is not formatted properly!");
             }
-            String rLocString = input.substring(0, separatorIndex);
-            loc = ResourceLocation.tryParse(rLocString);
-            if (loc == null) {
-                throw new IllegalArgumentException(rLocString + " is not a valid ResourceLocation!");
-            }
+            name = input.substring(0, separatorIndex);
             value = input.substring(separatorIndex + 1);
         }
 
@@ -49,30 +46,41 @@ public class ModConfig {
             return value;
         }
 
-        public ResourceLocation getLoc() {
-            return loc;
+        public String getName() {
+            return name;
         }
     }
 
+    //Returns false if either the name or value are not resource locations
+    private static final Predicate<Object> rLoc2 = object -> {
+        if(!(object instanceof String)) return false;
+        String str = (String) object;
+        try {
+            Element e = new Element(str);
+            return ResourceLocation.isValidResourceLocation(e.getName()) && ResourceLocation.isValidResourceLocation(e.getValue());
+        } catch(IllegalArgumentException e) {
+            HarvestLeveling.LOGGER.error("Error reading config: String " + str + " is not correct format, skipping...");
+            return false;
+        }
+    };
+    //Returns false if the value isn't a resource location
+    private static final Predicate<Object> stringRLoc = object -> {
+        if(!(object instanceof String)) return false;
+        String str = (String) object;
+        try {
+            return ResourceLocation.isValidResourceLocation(new Element(str).getValue());
+        } catch(IllegalArgumentException e) {
+            HarvestLeveling.LOGGER.error("Error reading config: String " + str + " is not correct format, skipping...");
+            return false;
+        }
+    };
+
     static {
-
-        //Returns false if the value of the element is either not formatted right or the value is not a resource location.
-        Predicate<Object> rLocValue = object -> {
-            if(!(object instanceof String)) return false;
-            String str = (String) object;
-            try {
-                return ResourceLocation.isValidResourceLocation(new Element(str).getValue());
-            } catch(IllegalArgumentException e) {
-                HarvestLeveling.LOGGER.error("Error reading config: String " + str + " is not correct format, skipping...");
-                return false;
-            }
-        };
-
 
         BUILDER.comment("Mod configuration. Format should be item;value. So for example: 'minecraft:wooden_pickaxe;minecraft:iron'").push("Configuration");
 
         itemLevelOverride = BUILDER.comment("A list of items and what tier they should use for their mining level. Only works for items that extend DiggerItem. To find all valid tiers, run /harvestleveling dump_tiers")
-                .defineList("itemLevelOverride", Arrays.asList(new String[0]), rLocValue);
+                .defineList("itemLevelOverride", Arrays.asList(new String[0]), rLoc2);
 
         BUILDER.pop();
 
@@ -83,9 +91,8 @@ public class ModConfig {
 
         ITEM_LEVEL_SET = new HashSet<>();
         for(String s : itemLevelOverride.get()) {
-            Element e = new Element(s);
-            if(!ResourceLocation.isValidResourceLocation(e.getValue())) throw new IllegalArgumentException("Error reading config: " + e.getValue() + " is not a valid ResourceLocation!");
-            ITEM_LEVEL_SET.add(e);
+            //Only add to set if both name and value are resource locations. Might be redundant to check this like twice but idk weird edge case somewhere probably
+            if(rLoc2.test(s)) ITEM_LEVEL_SET.add(new Element(s));
         }
     }
 

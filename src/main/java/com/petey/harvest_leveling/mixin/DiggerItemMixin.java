@@ -30,7 +30,7 @@ public abstract class DiggerItemMixin extends TieredItem {
         if(state.is(blocks)) {
             ResourceLocation loc = stack.getItem().getRegistryName();
             ModConfig.ITEM_LEVEL_SET.forEach(element -> {
-                if(element.getLoc().equals(loc)) {
+                if(element.getName().equals(loc)) {
                     Tier tier = TierSortingRegistry.byName(new ResourceLocation(element.getValue()));
                     //If the provided value read from config isn't valid/registered in TierSortingRegistry, it is skipped
                     if(tier == null) {

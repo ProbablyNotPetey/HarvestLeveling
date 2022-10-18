@@ -3,7 +3,9 @@ package com.petey.harvest_leveling;
 import com.mojang.logging.LogUtils;
 import com.petey.harvest_leveling.commands.DumpTiersCommand;
 import com.petey.harvest_leveling.config.ModConfig;
+import net.minecraft.world.item.Tiers;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -22,6 +24,7 @@ public class HarvestLeveling {
     public HarvestLeveling() {
         ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.COMMON, ModConfig.SPEC);
 
+//        HarvestLevelTier tier = new HarvestLevelTier("test_tier", Tiers.IRON, null);
         modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         MinecraftForge.EVENT_BUS.register(this);
     }
