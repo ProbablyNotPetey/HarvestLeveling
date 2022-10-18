@@ -38,7 +38,7 @@ public class HarvestLevelTier implements Tier {
     }
 
     private List<Tier> getTiersHigherThan(Tier tier) {
-        List<Tier> tiers = TierSortingRegistry.getSortedTiers();
+        List<Tier> tiers = new ArrayList<>(TierSortingRegistry.getSortedTiers());
         Collections.reverse(tiers);
         if (!TierSortingRegistry.isTierSorted(tier)) return List.of();
         return tiers.stream().takeWhile(t -> t != tier).toList();

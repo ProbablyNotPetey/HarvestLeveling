@@ -1,8 +1,12 @@
 package com.petey.harvest_leveling.config;
 
+import com.petey.harvest_leveling.HarvestLevelTier;
 import com.petey.harvest_leveling.HarvestLeveling;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.item.Tier;
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.common.TierSortingRegistry;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 
@@ -17,8 +21,11 @@ public class ModConfig {
     public static final ForgeConfigSpec SPEC;
 
     private static final ForgeConfigSpec.ConfigValue<List<? extends String>> itemLevelOverride;
+    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> customTiers;
 
     public static Set<Element> ITEM_LEVEL_SET;
+    public static Set<Element> TIER_AFTER_SET;
+    public static Set<HarvestLevelTier> CUSTOM_TIER_SET;
 
     /**
      * A config element that has a string name and a value. The two should be split by a ;
@@ -77,11 +84,12 @@ public class ModConfig {
 
     static {
 
-        BUILDER.comment("Mod configuration. Format should be item;value. So for example: 'minecraft:wooden_pickaxe;minecraft:iron'").push("Configuration");
+        BUILDER.comment("Mod configuration. Format should be thing;value. So for example: 'minecraft:wooden_pickaxe;minecraft:iron'").push("Configuration");
 
-        itemLevelOverride = BUILDER.comment("A list of items and what tier they should use for their mining level. Only works for items that extend DiggerItem. To find all valid tiers, run /harvestleveling dump_tiers")
+        itemLevelOverride = BUILDER.comment("A list of items and what tier they should use for their mining level. Format should be modid:item;modid:tier. Only works for items that extend DiggerItem. To find all valid tiers, run /harvestleveling dump_tiers")
                 .defineList("itemLevelOverride", Arrays.asList(new String[0]), rLoc2);
-
+        customTiers = BUILDER.comment("A list of custom tiers and what tier it should be placed after. Format should be name;modid:tier. Restart required")
+                .defineList("customTiers", Arrays.asList(new String[0]), stringRLoc);
         BUILDER.pop();
 
         SPEC = BUILDER.build();
@@ -94,6 +102,21 @@ public class ModConfig {
             //Only add to set if both name and value are resource locations. Might be redundant to check this like twice but idk weird edge case somewhere probably
             if(rLoc2.test(s)) ITEM_LEVEL_SET.add(new Element(s));
         }
+    }
+
+    public static void registerTiers() {
+        HarvestLeveling.LOGGER.info("Registering tiers!");
+        TIER_AFTER_SET = new HashSet<>();
+        for(String s : customTiers.get()) {
+            if(stringRLoc.test(s)) {
+                TIER_AFTER_SET.add(new Element(s));
+            }
+        }
+        CUSTOM_TIER_SET = new HashSet<>();
+        TIER_AFTER_SET.forEach(element -> {
+            Tier after = TierSortingRegistry.byName(new ResourceLocation(element.getValue()));
+            CUSTOM_TIER_SET.add(new HarvestLevelTier(element.getName(), after, BlockTags.create(new ResourceLocation(HarvestLeveling.MOD_ID, "needs_" + element.getName() + "_tool"))));
+        });
     }
 
     @SubscribeEvent
