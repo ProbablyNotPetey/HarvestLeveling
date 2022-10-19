@@ -3,12 +3,12 @@ Simple Minecraft mod for pack developers, allowing them to override a tool's har
 
 What this mod does do:
 
-- Manual override of a tool's harvest level to any tier registered in TierSortingRegistry
+- Manual override of a tool's harvest level to any tier registered in Forge's TierSortingRegistry
+- Allow for registering custom harvest levels via config
 - Provides a command to dump tiers registered in TierSortingRegistry
 
 What this mod *doesn't* do
 
-- Custom harvest level tiers (may come but unlikely)
 - Override of block's harvest level requirements (use vanilla/forge tags for this)
 - Harvest levels for non tools (item must extend DiggerItem)
 - Modify mining speeds of tools (use [Property Modifier](https://www.curseforge.com/minecraft/mc-mods/property-modifier) or a similar mod)
@@ -16,7 +16,9 @@ What this mod *doesn't* do
 ## How to Use
 
 1. Open `harvest_leveling-common.toml`
-2. In the list add any tools you want to override the harvest level for. Syntax should be `"modid:item;modid:tier"`
+2. In the first list add any tools you want to override the harvest level for. Syntax should be `"modid:item;modid:tier"`
+3. In the second list add any custom harvest levels you want. Syntax should be `"name;modid:tier"` with the tier being the tier that this custom harvest level comes immediately after. Restart required.
+
 
 ## Issues/Contributing
 
